@@ -1,5 +1,6 @@
 from purchase import Seat, User
 from random import choice
+from string import ascii_letters, digits
 
 
 class Ticket:
@@ -10,10 +11,9 @@ class Ticket:
 
     @staticmethod
     def _get_id():
-        let = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
         res = ''
         for i in range(8):
-            res = res + choice(let)
+            res = res + choice(ascii_letters + digits)
         return res
 
     def to_pdf(self):

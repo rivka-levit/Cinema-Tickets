@@ -1,5 +1,4 @@
 import sqlite3
-from ticket import Ticket
 
 
 class Seat:
@@ -70,7 +69,6 @@ class User:
         seat.occupy()
         card_balance = self._get_card_balance(card)
         self._update_balance(seat, card, card_balance)
-        Ticket(self, seat).to_pdf()
 
     @staticmethod
     def _update_balance(seat: Seat, card: Card, card_balance: float) -> None:

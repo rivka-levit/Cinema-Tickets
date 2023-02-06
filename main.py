@@ -1,4 +1,5 @@
 from purchase import User, Seat, Card
+from ticket import Ticket
 
 user = User(input('Your full name: '))
 seat = Seat(input('Preferred seat number: '))
@@ -15,4 +16,5 @@ else:
         print("There's a problem with your card")
     else:
         user.buy(seat, card)
+        Ticket(user, seat).to_pdf()
         print('Purchase successful!')

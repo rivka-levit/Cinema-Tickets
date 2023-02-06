@@ -1,4 +1,5 @@
 import sqlite3
+from ticket import Ticket
 
 
 class Seat:
@@ -21,8 +22,8 @@ class Seat:
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
         cursor.execute("""
-                        SELECT "taken" FROM 'Seat' WHERE "seat_id" == ?
-                        """, [self.seat_id])
+                SELECT "taken" FROM 'Seat' WHERE "seat_id" == ?
+                """, [self.seat_id])
         res = cursor.fetchall()
         connection.close()
         return res[0][0] == 0
@@ -50,7 +51,8 @@ class Card:
         cursor = connection.cursor()
         try:
             cursor.execute("""
-                    SELECT "type", "cvc", "holder", "balance" FROM 'Card' WHERE "number" == ?
+                    SELECT "type", "cvc", "holder", "balance" FROM 'Card' 
+                    WHERE "number" == ?
                     """, [self.number])
             res = cursor.fetchall()[0]
         except IndexError:
@@ -64,20 +66,30 @@ class User:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    @staticmethod
-    def buy(seat: Seat, card: Card):
+    def buy(self, seat: Seat, card: Card):
         seat.occupy()
+        card_balance = self._get_card_balance(card)
+        self._update_balance(seat, card, card_balance)
+        Ticket(self, seat).to_pdf()
+
+    @staticmethod
+    def _update_balance(seat: Seat, card: Card, card_balance: float) -> None:
+        new_balance = card_balance - seat.price
+        connection = sqlite3.connect(card.database)
+        connection.execute("""
+            UPDATE "Card" SET "balance" = ? WHERE "number" == ?
+        """, [new_balance, card.number])
+        connection.commit()
+        connection.close()
+
+    @staticmethod
+    def _get_card_balance(card: Card) -> float:
         connection = sqlite3.connect(card.database)
         cursor = connection.cursor()
         cursor.execute("""
         SELECT "balance" FROM "Card" WHERE "number" == ?
         """, [card.number])
         res = cursor.fetchall()[0][0]
-        bal = res - seat.price
-
-        connection.execute("""
-            UPDATE "Card" SET "balance" = ? WHERE "number" == ?
-        """, [bal, card.number])
-
         connection.commit()
         connection.close()
+        return res

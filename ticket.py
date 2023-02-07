@@ -6,8 +6,9 @@ from fpdf import FPDF
 
 class Ticket:
     """
-    Generates a Pdf file that contains the digital ticket user has purchased,
-    with his name, number of the seat, id of the thicket and the price.
+    Generates a Pdf file that contains the digital ticket that user has
+    purchased, with his name, number of the seat, id of the thicket and
+    the price.
     """
     filepath = 'ticket.pdf'
 
@@ -39,6 +40,8 @@ class Ticket:
             pdf.cell(w=389, h=35, txt=f'{value}', border=1, ln=1)
 
             pdf.cell(w=539, h=5, txt='', border=0, ln=1)
+
+        # Write the pdf file
 
         pdf.output(self.filepath)
 

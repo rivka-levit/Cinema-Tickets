@@ -93,6 +93,15 @@ class User:
     def __init__(self, name: str) -> None:
         self.name = name
 
+    @staticmethod
+    def choose_seat(seat: Seat) -> Seat:
+        if seat.is_free():
+            return seat
+        while not seat.is_free():
+            print('Seat is taken!')
+            seat = Seat(input('Enter another seat number: '))
+        return seat
+
     def buy(self, seat: Seat, card: Card):
         """
         Make the purchase of a ticket. Sets the seat to occupied and change

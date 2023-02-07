@@ -95,6 +95,11 @@ class User:
 
     @staticmethod
     def choose_seat(seat: Seat) -> Seat:
+        """
+        Check if the seat is free and choose another one if
+        it is taken
+        :return: the free seat object that the user has chosen
+        """
         if seat.is_free():
             return seat
         while not seat.is_free():

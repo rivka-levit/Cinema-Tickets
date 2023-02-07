@@ -93,19 +93,23 @@ class User:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    @staticmethod
-    def choose_seat(seat: Seat) -> Seat:
+    def choose_seat(self, seat: Seat) -> Seat | None:
         """
         Check if the seat is free and choose another one if
         it is taken
         :return: the free seat object that the user has chosen
         """
-        if seat.is_free():
-            return seat
-        while not seat.is_free():
+        while True:
+            if seat.is_free():
+                return seat
             print('Seat is taken!')
-            seat = Seat(input('Enter another seat number: '))
-        return seat
+            print('Free seats: ', end='')
+            print(*self._all_free_seats(seat))
+            answer = input('Enter preferred seat or "q" for exit: ')
+            if answer == 'q':
+                return None
+            else:
+                seat = Seat(answer)
 
     def buy(self, seat: Seat, card: Card):
         """
@@ -119,6 +123,16 @@ class User:
         self._update_balance(seat, card, card_balance)
         Ticket(self, seat).to_pdf()
         return 'Purchase successful!'
+
+    @staticmethod
+    def _all_free_seats(seat: Seat) -> list:
+        connection = sqlite3.connect(seat.database)
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT "seat_id" FROM "Seat" WHERE "taken" = 0
+        """)
+        free_seats = [i[0] for i in cursor.fetchall()]
+        return free_seats
 
     @staticmethod
     def _update_balance(seat: Seat, card: Card, card_balance: float) -> None:
